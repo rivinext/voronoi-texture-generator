@@ -16,6 +16,7 @@ const fields = {
   palette: document.querySelector("#palette"),
   guides: document.querySelector("#guides"),
   invertEdges: document.querySelector("#invertEdges"),
+  colorizeEdges: document.querySelector("#colorizeEdges"),
 };
 
 const readouts = {
@@ -230,6 +231,7 @@ function readSettings() {
     customColors: customColors.map((color) => hexToRgb(color)),
     guides: fields.guides.checked,
     invertEdges: fields.invertEdges.checked,
+    colorizeEdges: fields.colorizeEdges.checked,
   };
 }
 
@@ -393,6 +395,14 @@ function renderPixel(settings, palette, site, firstDistance, secondDistance, edg
   if (settings.style === "edges") {
     const normalizedEdgeDistance = edgeDistance / radius;
     const isEdge = normalizedEdgeDistance <= edgeWidth;
+    if (settings.colorizeEdges) {
+      if (settings.invertEdges) {
+        return isEdge ? [255, 255, 255] : base;
+      }
+
+      return isEdge ? [0, 0, 0] : base;
+    }
+
     const level = settings.invertEdges ? (isEdge ? 255 : 0) : (isEdge ? 0 : 255);
     return [level, level, level];
   }
