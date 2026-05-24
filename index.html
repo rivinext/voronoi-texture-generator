@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tileable Voronoi Texture Generator</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="toolbar">
+        <div>
+          <p class="kicker">Procedural Texture</p>
+          <h1>Tileable Voronoi</h1>
+        </div>
+        <div class="toolbar-actions">
+          <button id="reroll" type="button" title="新しいシードを作る">Seed</button>
+          <button id="download" class="primary" type="button" title="現在のタイルをPNGで書き出す">
+            PNG
+          </button>
+        </div>
+      </header>
+
+      <section class="workspace" aria-label="ボロノイテクスチャジェネレーター">
+        <form class="controls" autocomplete="off">
+          <label>
+            <span>シード</span>
+            <input id="seed" name="seed" value="voronoi-24" />
+          </label>
+
+          <div class="row">
+            <label>
+              <span>幅(px)</span>
+              <input id="width" name="width" type="number" min="64" max="8192" step="1" value="512" />
+            </label>
+            <label>
+              <span>高さ(px)</span>
+              <input id="height" name="height" type="number" min="64" max="8192" step="1" value="512" />
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              <span>表現</span>
+              <select id="style" name="style">
+                <option value="surface" selected>Surface</option>
+                <option value="cells">Cells</option>
+                <option value="edges">Edges</option>
+                <option value="distance">Distance</option>
+              </select>
+            </label>
+            <label>
+              <span>パレット</span>
+              <select id="palette" name="palette">
+                <option value="mineral" selected>Mineral</option>
+                <option value="mosaic">Mosaic</option>
+                <option value="lava">Lava</option>
+                <option value="mono">Mono</option>
+                <option value="custom">Custom</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="palette-editor" aria-label="カスタムパレット">
+            <div id="swatches" class="swatch-grid"></div>
+            <button id="addColor" type="button">色を追加</button>
+          </div>
+
+          <label>
+            <span>セル数 <output id="cellCountText">72</output></span>
+            <input id="cellCount" name="cellCount" type="range" min="8" max="1000" value="72" />
+          </label>
+
+          <label>
+            <span>不規則さ <output id="jitterText">0.82</output></span>
+            <input id="jitter" name="jitter" type="range" min="0" max="1" step="0.01" value="0.82" />
+          </label>
+
+          <label>
+            <span>境界幅 <output id="edgeText">0.16</output></span>
+            <input id="edgeWidth" name="edgeWidth" type="range" min="0.02" max="0.42" step="0.01" value="0.16" />
+          </label>
+
+          <label>
+            <span>島の角丸 <output id="roundingText">0.18</output></span>
+            <input id="rounding" name="rounding" type="range" min="0" max="0.6" step="0.01" value="0.18" />
+          </label>
+
+          <label>
+            <span>凹凸感 <output id="reliefText">0.34</output></span>
+            <input id="relief" name="relief" type="range" min="0" max="1" step="0.01" value="0.34" />
+          </label>
+
+          <label class="toggle">
+            <span>継ぎ目ガイド</span>
+            <input id="guides" name="guides" type="checkbox" checked />
+          </label>
+
+          <label class="toggle">
+            <span>Edges 白黒反転</span>
+            <input id="invertEdges" name="invertEdges" type="checkbox" />
+          </label>
+
+          <p id="status" class="status" aria-live="polite">生成準備完了</p>
+        </form>
+
+        <section class="canvases" aria-label="生成結果">
+          <figure>
+            <figcaption>PNGタイル</figcaption>
+            <canvas id="tile" width="512" height="512"></canvas>
+          </figure>
+          <figure>
+            <figcaption>3 x 3 繰り返しプレビュー</figcaption>
+            <canvas id="repeat" width="768" height="768"></canvas>
+          </figure>
+        </section>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
