@@ -1,0 +1,291 @@
+:root {
+  color-scheme: dark;
+  --bg: #101315;
+  --panel: #171c1d;
+  --panel-2: #202728;
+  --line: #34403e;
+  --text: #eef1e8;
+  --muted: #a7b2a9;
+  --accent: #d6b85a;
+  --accent-ink: #18140a;
+  --focus: #76c7be;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    linear-gradient(130deg, rgba(118, 199, 190, 0.08), transparent 34rem),
+    var(--bg);
+  color: var(--text);
+  font-family:
+    Inter, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic UI", system-ui, sans-serif;
+  letter-spacing: 0;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+select,
+input {
+  accent-color: var(--accent);
+}
+
+button,
+select,
+input:not([type="range"]) {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel-2);
+  color: var(--text);
+}
+
+button {
+  min-width: 56px;
+  min-height: 42px;
+  padding: 0 15px;
+  cursor: pointer;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+button.primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 700;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.app-shell {
+  width: min(1480px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 24px 0 32px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  border-bottom: 1px solid var(--line);
+  padding: 0 0 18px;
+}
+
+.toolbar h1,
+.toolbar p {
+  margin: 0;
+}
+
+.kicker {
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin-top: 3px;
+  font-size: clamp(1.5rem, 3vw, 2.45rem);
+  line-height: 1.08;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(270px, 330px) minmax(0, 1fr);
+  gap: 24px;
+  padding-top: 22px;
+}
+
+.controls {
+  align-self: start;
+  display: grid;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 18px;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+label span {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+output {
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+input:not([type="range"]),
+select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 11px;
+}
+
+input[type="range"] {
+  width: 100%;
+  margin: 0;
+}
+
+.palette-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.palette-editor button {
+  width: 100%;
+}
+
+.swatch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(52px, 1fr));
+  gap: 8px;
+}
+
+.swatch {
+  position: relative;
+  display: grid;
+  gap: 5px;
+  font-size: 0.76rem;
+}
+
+.swatch span {
+  justify-content: center;
+}
+
+.swatch input[type="color"] {
+  width: 100%;
+  min-width: 0;
+  height: 38px;
+  padding: 3px;
+}
+
+.remove-color {
+  position: absolute;
+  top: -7px;
+  right: -6px;
+  min-width: 22px;
+  width: 22px;
+  min-height: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.toggle {
+  align-content: start;
+}
+
+.toggle input {
+  width: 22px;
+  height: 22px;
+  margin: 2px 0 0;
+}
+
+.status {
+  min-height: 22px;
+  margin: 0;
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.canvases {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(260px, 1fr));
+  align-items: start;
+  gap: 20px;
+  min-width: 0;
+}
+
+figure {
+  min-width: 0;
+  margin: 0;
+}
+
+figcaption {
+  margin-bottom: 9px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 750;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #080a0b;
+  image-rendering: auto;
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    width: min(100% - 24px, 720px);
+    padding-top: 16px;
+  }
+
+  .workspace,
+  .canvases {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 460px) {
+  .toolbar {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .toolbar-actions,
+  .row {
+    width: 100%;
+    grid-template-columns: 1fr;
+  }
+
+  .toolbar-actions button {
+    flex: 1;
+  }
+}
