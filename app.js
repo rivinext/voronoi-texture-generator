@@ -279,6 +279,93 @@ function neighborDistanceSquared(settings, a, b) {
   return vector.dx * vector.dx + vector.dy * vector.dy;
 }
 
+function createSiteGrid(settings, sites, columns, rows) {
+  const gridColumns = Math.max(1, columns);
+  const gridRows = Math.max(1, rows);
+  const buckets = Array.from({ length: gridColumns * gridRows }, () => []);
+
+  for (const site of sites) {
+    const column = Math.min(gridColumns - 1, Math.floor(site.x * gridColumns));
+    const row = Math.min(gridRows - 1, Math.floor(site.y * gridRows));
+    buckets[row * gridColumns + column].push(site);
+  }
+
+  return { buckets, columns: gridColumns, rows: gridRows };
+}
+
+function findNearestSites(settings, grid, sites, x, y) {
+  const scale = settings.aspectScale || getAspectScale(settings);
+  const centerColumn = Math.floor(x * grid.columns);
+  const centerRow = Math.floor(y * grid.rows);
+  let firstDistance = Number.POSITIVE_INFINITY;
+  let secondDistance = Number.POSITIVE_INFINITY;
+  let closestSite = sites[0];
+  let closestDx = 0;
+  let closestDy = 0;
+  let secondDx = 0;
+  let secondDy = 0;
+  let count = 0;
+
+  const testSite = (site) => {
+    const dx = torusDelta(x, site.x) * scale.x;
+    const dy = torusDelta(y, site.y) * scale.y;
+    const distance = dx * dx + dy * dy;
+
+    count += 1;
+
+    if (distance < firstDistance) {
+      secondDistance = firstDistance;
+      secondDx = closestDx;
+      secondDy = closestDy;
+      firstDistance = distance;
+      closestSite = site;
+      closestDx = dx;
+      closestDy = dy;
+    } else if (distance < secondDistance) {
+      secondDistance = distance;
+      secondDx = dx;
+      secondDy = dy;
+    }
+  };
+
+  const scanRadius = (radius) => {
+    for (let rowOffset = -radius; rowOffset <= radius; rowOffset += 1) {
+      const row = (centerRow + rowOffset + grid.rows) % grid.rows;
+
+      for (let columnOffset = -radius; columnOffset <= radius; columnOffset += 1) {
+        const column = (centerColumn + columnOffset + grid.columns) % grid.columns;
+        const bucket = grid.buckets[row * grid.columns + column];
+
+        for (const site of bucket) {
+          testSite(site);
+        }
+      }
+    }
+  };
+
+  scanRadius(1);
+
+  if (count < 2) {
+    scanRadius(2);
+  }
+
+  if (count < 2) {
+    for (const site of sites) {
+      testSite(site);
+    }
+  }
+
+  return {
+    closestDx,
+    closestDy,
+    closestSite,
+    firstDistance,
+    secondDistance,
+    secondDx,
+    secondDy,
+  };
+}
+
 function buildSites(settings, palette) {
   const random = makeRandom(`${settings.seed}:${settings.cellCount}:${settings.jitter}`);
   const aspect = settings.width / settings.height;
@@ -313,7 +400,10 @@ function buildSites(settings, palette) {
       .slice(0, neighborCount);
   }
 
-  return sites;
+  return {
+    sites,
+    grid: createSiteGrid(settings, sites, columns, rows),
+  };
 }
 
 function boundaryDistance(
@@ -417,9 +507,9 @@ function renderPixel(settings, palette, site, firstDistance, secondDistance, edg
 
 function drawTexture(settings, targetCanvas = tileCanvas, drawPreview = true) {
   settings.aspectScale = getAspectScale(settings);
-  const scale = settings.aspectScale;
   const palette = resolvePalette(settings);
-  const sites = buildSites(settings, palette);
+  const siteData = buildSites(settings, palette);
+  const { sites, grid } = siteData;
   const targetContext = targetCanvas.getContext("2d", { willReadFrequently: true });
   const image = targetContext.createImageData(settings.width, settings.height);
   const pixels = image.data;
@@ -432,33 +522,16 @@ function drawTexture(settings, targetCanvas = tileCanvas, drawPreview = true) {
 
     for (let x = 0; x < settings.width; x += 1) {
       const sampleX = (x + 0.5) / settings.width;
-      let firstDistance = Number.POSITIVE_INFINITY;
-      let secondDistance = Number.POSITIVE_INFINITY;
-      let closestSite = sites[0];
-      let closestDx = 0;
-      let closestDy = 0;
-      let secondDx = 0;
-      let secondDy = 0;
-
-      for (const site of sites) {
-        const dx = torusDelta(sampleX, site.x) * scale.x;
-        const dy = torusDelta(sampleY, site.y) * scale.y;
-        const distance = dx * dx + dy * dy;
-
-        if (distance < firstDistance) {
-          secondDistance = firstDistance;
-          secondDx = closestDx;
-          secondDy = closestDy;
-          firstDistance = distance;
-          closestSite = site;
-          closestDx = dx;
-          closestDy = dy;
-        } else if (distance < secondDistance) {
-          secondDistance = distance;
-          secondDx = dx;
-          secondDy = dy;
-        }
-      }
+      const nearest = findNearestSites(settings, grid, sites, sampleX, sampleY);
+      const {
+        closestDx,
+        closestDy,
+        closestSite,
+        firstDistance,
+        secondDistance,
+        secondDx,
+        secondDy,
+      } = nearest;
 
       let edgeDistance = boundaryDistance(
         firstDistance,
